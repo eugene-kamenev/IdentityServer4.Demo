@@ -21,50 +21,29 @@ namespace IdentityServer4Demo
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
-
-            services.AddIdentityServer(options =>
-            {
-                options.Events.RaiseErrorEvents = true;
-                options.Events.RaiseFailureEvents = true;
-                options.Events.RaiseInformationEvents = true;
-                options.Events.RaiseSuccessEvents = true;
-            })
-                .AddInMemoryApiResources(Config.GetApis())
+            
+                services.AddMvc();
+                services.AddIdentityServer(options => {
+                    options.Events.RaiseErrorEvents = true;
+                    options.Events.RaiseFailureEvents = true;
+                    options.Events.RaiseInformationEvents = true;
+                    options.Events.RaiseSuccessEvents = true;
+                })
+                .AddDeveloperSigningCredential(persistKey: false)
+                .AddRedirectUriValidator<DemoRedirectValidator>()
                 .AddInMemoryIdentityResources(Config.GetIdentityResources())
+                .AddInMemoryApiResources(Config.GetApis())
                 .AddInMemoryClients(Config.GetClients())
-                .AddTestUsers(TestUsers.Users)
-                .AddDeveloperSigningCredential(persistKey: false);
+                .AddTestUsers(Config.GetUsers())
+                .AddProfileService<UserProfileService>();
 
             services.AddAuthentication()
                 .AddGoogle("Google", options =>
                 {
                     options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
 
-                    options.ClientId = Configuration["Secret:GoogleClientId"];
-                    options.ClientSecret = Configuration["Secret:GoogleClientSecret"];
-                })
-                .AddOpenIdConnect("aad", "Sign-in with Azure AD", options =>
-                {
-                    options.Authority = "https://login.microsoftonline.com/common";
-                    options.ClientId = "https://leastprivilegelabs.onmicrosoft.com/38196330-e766-4051-ad10-14596c7e97d3";
-
-                    options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
-                    options.SignOutScheme = IdentityServerConstants.SignoutScheme;
-
-                    options.ResponseType = "id_token";
-                    options.CallbackPath = "/signin-aad";
-                    options.SignedOutCallbackPath = "/signout-callback-aad";
-                    options.RemoteSignOutPath = "/signout-aad";
-
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = false,
-                        ValidAudience = "165b99fd-195f-4d93-a111-3e679246e6a9",
-
-                        NameClaimType = "name",
-                        RoleClaimType = "role"
-                    };
+                    options.ClientId = "736799995695-ccj7konp55o0jrgsjlc6ne3do9u943ga.apps.googleusercontent.com";
+                    options.ClientSecret = "QTE60gcX5yGOcKzjPC0ik-xz";
                 })
                 .AddLocalApi(options =>
                 {

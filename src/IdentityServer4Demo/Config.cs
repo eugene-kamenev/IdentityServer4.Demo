@@ -1,10 +1,71 @@
-﻿using IdentityServer4.Models;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using IdentityServer4;
+using IdentityServer4.Models;
+using IdentityServer4.Test;
+using System.Security.Claims;
+using System.Security.Cryptography.X509Certificates;
+using System.IO;
+using IdentityServer4.Services;
+using Microsoft.AspNetCore.Identity;
 
 namespace IdentityServer4Demo
 {
     public class Config
     {
+        internal static X509Certificate2 GetSigningCertificate(string rootPath)
+        {
+            var fileName = Path.Combine(rootPath, "cert.pfx");
+
+            if (!File.Exists(fileName))
+            {
+                throw new FileNotFoundException("Signing Certificate is missing!");
+            }
+
+            var cert = new X509Certificate2(fileName, "12345678");
+            return cert;
+        }
+        public static List<TestUser> GetUsers()
+        {
+            return new List<TestUser>
+            {
+                new TestUser
+                {
+                    SubjectId = "100000B",
+                    Username = "alice",
+                    Password = "password",
+
+                    Claims = new []
+                    {
+                        new Claim("name", "Alice"),
+                        new Claim("family_name", "Buyer"),
+                        new Claim("email", "alice@buyer.com"),
+                        new Claim("company", "BuyerCompany"),
+                        new Claim("phone_number", "+14155559999"),
+                        new Claim("zoneinfo", "Asia/Almaty")
+                    }
+                },
+                new TestUser
+                {
+                    SubjectId = "200000S",
+                    Username = "bob",
+                    Password = "password",
+
+                    Claims = new []
+                    {
+                        new Claim("name", "Bob"),
+                        new Claim("family_name", "Smart Supplier"),
+                        new Claim("email", "bob@supplier.com"),
+                        new Claim("company", "SupplierCompany"),
+                        new Claim("phone_number", "+14155559912"),
+                        new Claim("zoneinfo", "Asia/Almaty")
+                    }
+                }
+            };
+        }
+
         public static IEnumerable<IdentityResource> GetIdentityResources()
         {
             return new List<IdentityResource>
@@ -30,203 +91,23 @@ namespace IdentityServer4Demo
         {
             return new List<Client>
             {
-                // native clients
                 new Client
                 {
-                    ClientId = "native.hybrid",
-                    ClientName = "Native Client (Hybrid with PKCE)",
-
-                    RedirectUris = { "https://notused" },
-                    PostLogoutRedirectUris = { "https://notused" },
-
-                    RequireClientSecret = false,
-                    RequireConsent = false,
-
-                    AllowedGrantTypes = GrantTypes.Hybrid,
-                    RequirePkce = true,
-                    AllowedScopes = { "openid", "profile", "email", "api" },
-
-                    AllowOfflineAccess = true,
-                    RefreshTokenUsage = TokenUsage.ReUse
-                },
-                new Client
-                {
-                    ClientId = "server.hybrid",
-                    ClientName = "Server-based Client (Hybrid)",
-
-                    RedirectUris = { "https://notused" },
-                    PostLogoutRedirectUris = { "https://notused" },
-
+                    ClientId = "tradefin_api",
+                    ClientName = "TradeFin API Client",
                     ClientSecrets = { new Secret("secret".Sha256()) },
-                    RequireConsent = false,
-
-                    AllowedGrantTypes = GrantTypes.Hybrid,
-                    AllowedScopes = { "openid", "profile", "email", "api" },
-
-                    AllowOfflineAccess = true,
-                    RefreshTokenUsage = TokenUsage.ReUse
-                },
-                new Client
-                {
-                    ClientId = "server.hybrid.short",
-                    ClientName = "Server-based Client (Hybrid)",
-
-                    RedirectUris = { "https://notused" },
-                    PostLogoutRedirectUris = { "https://notused" },
-
-                    ClientSecrets = { new Secret("secret".Sha256()) },
-                    RequireConsent = false,
-
-                    AllowedGrantTypes = GrantTypes.Hybrid,
-                    AllowedScopes = { "openid", "profile", "email", "api" },
-
-                    AllowOfflineAccess = true,
-                    RefreshTokenUsage = TokenUsage.ReUse,
-                    AccessTokenLifetime = 70,
-                },
-                new Client
-                {
-                    ClientId = "native.code",
-                    ClientName = "Native Client (Code with PKCE)",
-
-                    RedirectUris = { "https://notused" },
-                    PostLogoutRedirectUris = { "https://notused" },
-
-                    RequireClientSecret = false,
-                    RequireConsent = false,
-
-                    AllowedGrantTypes = GrantTypes.Code,
-                    RequirePkce = true,
-                    AllowedScopes = { "openid", "profile", "email", "api" },
-
-                    AllowOfflineAccess = true,
-                    RefreshTokenUsage = TokenUsage.ReUse
-                },
-                new Client
-                {
-                    ClientId = "server.code",
-                    ClientName = "Service Client (Code)",
-
-                    RedirectUris = { "https://notused" },
-                    PostLogoutRedirectUris = { "https://notused" },
-
-                    ClientSecrets = { new Secret("secret".Sha256()) },
-                    RequireConsent = false,
-
-                    AllowedGrantTypes = GrantTypes.Code,
-                    AllowedScopes = { "openid", "profile", "email", "api" },
-
-                    AllowOfflineAccess = true,
-                    RefreshTokenUsage = TokenUsage.ReUse
-                },
-
-                // server to server
-                new Client
-                {
-                    ClientId = "client",
-                    ClientSecrets = { new Secret("secret".Sha256()) },
-
-                    AllowedGrantTypes = GrantTypes.ClientCredentials,
-                    AllowedScopes = { "api" },
-                },
-
-                // SPA per new security guidance
-                new Client
-                {
-                    ClientId = "spa",
-                    ClientName = "SPA (Code + PKCE)",
-
-                    RequireClientSecret = false,
-                    RequireConsent = false,
-
-                    RedirectUris = { "https://notused" },
-                    PostLogoutRedirectUris = { "https://notused" },
-
-                    AllowedGrantTypes = GrantTypes.Code,
-                    AllowedScopes = { "openid", "profile", "email", "api" },
-
-                    AllowOfflineAccess = true,
-                    RefreshTokenUsage = TokenUsage.ReUse
-                },
-                new Client
-                {
-                    ClientId = "spa.short",
-                    ClientName = "SPA (Code + PKCE)",
-
-                    RequireClientSecret = false,
-                    RequireConsent = false,
-
-                    RedirectUris = { "https://notused" },
-                    PostLogoutRedirectUris = { "https://notused" },
-
-                    AllowedGrantTypes = GrantTypes.Code,
-                    AllowedScopes = { "openid", "profile", "email", "api" },
-
-                    AllowOfflineAccess = true,
-                    RefreshTokenUsage = TokenUsage.OneTimeOnly,
-                    AccessTokenLifetime = 70
-                },
-
-                // implicit (e.g. SPA or OIDC authentication)
-                new Client
-                {
-                    ClientId = "implicit",
-                    ClientName = "Implicit Client",
                     AllowAccessTokensViaBrowser = true,
                     RequireConsent = false,
 
-                    RedirectUris = { "https://notused" },
-                    PostLogoutRedirectUris = { "https://notused" },
-                    FrontChannelLogoutUri = "http://localhost:5000/signout-idsrv", // for testing identityserver on localhost
+                    RedirectUris = { "http://localhost:8080/oauth/callback/oidc" },
+                    PostLogoutRedirectUris = { "http://localhost:8080/auth/success" },
+                    FrontChannelLogoutUri = "http://localhost:5000/signout-idsrv",
 
-                    AllowedGrantTypes = GrantTypes.Implicit,
-                    AllowedScopes = { "openid", "profile", "email", "api" },
-                },
-
-                // implicit using reference tokens (e.g. SPA or OIDC authentication)
-                new Client
-                {
-                    ClientId = "implicit.reference",
-                    ClientName = "Implicit Client using reference tokens",
-                    AllowAccessTokensViaBrowser = true,
-
-                    AccessTokenType = AccessTokenType.Reference,
-                    RequireConsent = false,
-
-                    RedirectUris = { "https://notused" },
-                    PostLogoutRedirectUris = { "https://notused" },
-
-                    AllowedGrantTypes = GrantTypes.Implicit,
-                    AllowedScopes = { "openid", "profile", "email", "api" },
-                },
-
-                // implicit using reference tokens (e.g. SPA or OIDC authentication)
-                new Client
-                {
-                    ClientId = "implicit.shortlived",
-                    ClientName = "Implicit Client using short-lived tokens",
-                    AllowAccessTokensViaBrowser = true,
-
-                    AccessTokenLifetime = 70,
-                    RequireConsent = false,
-
-                    RedirectUris = { "https://notused" },
-                    PostLogoutRedirectUris = { "https://notused" },
-
-                    AllowedGrantTypes = GrantTypes.Implicit,
-                    AllowedScopes = { "openid", "profile", "email", "api" },
-                },
-                // device flow
-                new Client
-                {
-                    ClientId = "device",
-                    ClientName = "Device Flow Client",
-
-                    AllowedGrantTypes = GrantTypes.DeviceFlow,
-                    RequireClientSecret = false,
-
+                    AllowedGrantTypes = GrantTypes.ImplicitAndClientCredentials,
+                    AllowedScopes = { "openid", "profile", "email", "api", "company", "phoneNumber", "timeZone" },
                     AllowOfflineAccess = true,
-                    AllowedScopes = { "openid", "profile", "email", "api" }
+                    BackChannelLogoutSessionRequired = true,
+                    BackChannelLogoutUri = "http://localhost:8080/logout"
                 }
             };
         }
