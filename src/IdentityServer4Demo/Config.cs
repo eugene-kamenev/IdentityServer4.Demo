@@ -103,7 +103,7 @@ namespace IdentityServer4Demo
                     PostLogoutRedirectUris = { "http://localhost:8080/auth/success" },
                     FrontChannelLogoutUri = "http://localhost:5000/signout-idsrv",
 
-                    AllowedGrantTypes = GrantTypes.ImplicitAndClientCredentials,
+                    AllowedGrantTypes = GrantTypes.Code,
                     AllowedScopes = { "openid", "profile", "email", "api", "company", "phoneNumber", "timeZone" },
                     AllowOfflineAccess = true,
                     BackChannelLogoutSessionRequired = true,
