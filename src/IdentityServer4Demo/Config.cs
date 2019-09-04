@@ -49,6 +49,22 @@ namespace IdentityServer4Demo
                 },
                 new TestUser
                 {
+                    SubjectId = "100001B",
+                    Username = "alice2",
+                    Password = "password",
+
+                    Claims = new []
+                    {
+                        new Claim("name", "Alice2"),
+                        new Claim("family_name", "Buyer2"),
+                        new Claim("email", "alice2@buyer.com"),
+                        new Claim("company", "BuyerCompany"),
+                        new Claim("phone_number", "+14155559998"),
+                        new Claim("zoneinfo", "Asia/Almaty")
+                    }
+                },
+                new TestUser
+                {
                     SubjectId = "200000S",
                     Username = "bob",
                     Password = "password",
@@ -60,6 +76,22 @@ namespace IdentityServer4Demo
                         new Claim("email", "bob@supplier.com"),
                         new Claim("company", "SupplierCompany"),
                         new Claim("phone_number", "+14155559912"),
+                        new Claim("zoneinfo", "Asia/Almaty")
+                    }
+                },
+                new TestUser
+                {
+                    SubjectId = "200001S",
+                    Username = "bob2",
+                    Password = "password",
+
+                    Claims = new []
+                    {
+                        new Claim("name", "Bob2"),
+                        new Claim("family_name", "Smart Supplier2"),
+                        new Claim("email", "bob2@supplier.com"),
+                        new Claim("company", "SupplierCompany"),
+                        new Claim("phone_number", "+14155559911"),
                         new Claim("zoneinfo", "Asia/Almaty")
                     }
                 }
