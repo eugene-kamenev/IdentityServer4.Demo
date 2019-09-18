@@ -74,7 +74,6 @@ namespace IdentityServer4Demo
                         new Claim("name", "Bob"),
                         new Claim("family_name", "Smart Supplier"),
                         new Claim("email", "bob@supplier.com"),
-                        new Claim("company", "SupplierCompany"),
                         new Claim("phone_number", "+14155559912"),
                         new Claim("zoneinfo", "Asia/Almaty")
                     }
@@ -90,7 +89,6 @@ namespace IdentityServer4Demo
                         new Claim("name", "Bob2"),
                         new Claim("family_name", "Smart Supplier2"),
                         new Claim("email", "bob2@supplier.com"),
-                        new Claim("company", "SupplierCompany"),
                         new Claim("phone_number", "+14155559911"),
                         new Claim("zoneinfo", "Asia/Almaty")
                     }
